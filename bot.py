@@ -1,6 +1,7 @@
 import os
 import discord
 from discord.ext import commands
+from discord import app_commands
 import random
 import asyncio
 from datetime import datetime
@@ -13,10 +14,19 @@ bot = commands.Bot(command_prefix="!", intents=intents)
 @bot.event
 async def on_ready():
     print(f"✅ Logged in as {bot.user}")
+    try:
+        synced = await bot.tree.sync()
+        print(f"✅ Synced {len(synced)} slash command(s)")
+    except Exception as e:
+        print(f"❌ Failed to sync slash commands: {e}")
 
 @bot.command()
 async def hello(ctx):
     await ctx.send(f"Hey {ctx.author.name}! 👋")
+
+@bot.tree.command(name="hello", description="Greet the bot with a slash command")
+async def hello_slash(interaction: discord.Interaction):
+    await interaction.response.send_message(f"Hey {interaction.user.name}! 👋")
 
 @bot.command()
 async def ping(ctx):
